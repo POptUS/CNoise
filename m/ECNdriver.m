@@ -33,7 +33,7 @@ h = 1e-14;
 % Evaluate the function at m+1 equally spaced points  
 fval = zeros(m+1,1);
 mid = floor((m+2)/2);
-for i=1:m+1
+for i = 1:m + 1
     s = 2*(i-mid)/m;
     x = xb + s*h*p;
     fval(i) = feval(func,x);
