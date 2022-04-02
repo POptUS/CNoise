@@ -3,7 +3,7 @@ function y = mcfinance(x)
     %  Evaluating today's value of a dollar n years from now with lognormal
     %  interest rates with variance x. For details see page 20 of:
     %     R. E. Caflisch, Monte Carlo and Quasi-Monte Carlo methods,
-    %     Acta Numerica, 7(1998), pp. 1–49.
+    %     Acta Numerica, 7(1998), pp. 1--49.
     %
     %  n = 3
     %

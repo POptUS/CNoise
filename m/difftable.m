@@ -37,12 +37,15 @@ end
 
 % Print the table:
 disp('\begin{table}[htb!]');
-disp(strcat('\caption{\label{tab:diff} Difference table for $f(t)=\cos(t)+\sin(t)+10^{-3}U_{[0,2\sqrt{3}]}$  $\left(m=6, h=10^{-2}\right)$}'));
+str1 = '\caption{\label{tab:diff} Difference table for $f(t)=\cos(t)+';
+str2 = '\sin(t)+10^{-3}U_{[0,2\sqrt{3}]}$  $\left(m=6, h=10^{-2}\right)$}';
+disp(strcat(str1, str2));
 disp('\begin{center} \footnotesize');
 disp('\begin{tabular}{|c|rrrrrrr|} \hline');
 disp('i & k & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline');
 for i = 1:nf - 1
-    str = strcat(num2str(i - 1), sprintf(' & %4.3f', T(i, 1)), sprintf(' & %3.2e ', T(i, 2:nf - i + 1)));
+    str = strcat(num2str(i - 1), sprintf(' & %4.3f', T(i, 1)), ...
+                 sprintf(' & %3.2e ', T(i, 2:nf - i + 1)));
     str = strrep(str, 'e+0', 'e+');
     str = strrep(str, 'e-0', 'e-');
     for j = 1:i - 1

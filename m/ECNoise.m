@@ -69,7 +69,8 @@ function [fnoise, level, inform] = ECNoise(nf, fval)
         % Determine differences in sign.
         emin = min(fval(1:nf - j));
         emax = max(fval(1:nf - j));
-        if emin * emax < 0.0 dsgn(j) = 1;
+        if emin * emax < 0.0
+            dsgn(j) = 1;
         end
     end
 
