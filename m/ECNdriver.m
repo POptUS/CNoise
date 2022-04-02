@@ -19,7 +19,7 @@ xb = rand(n,1);
 rand('state',113);
 p = rand(n,1);
 % This procedure is inefficient for large n.
-while norm(p)>1
+while norm(p) > 1
     p = rand(n,1);
 end
 p = p/norm(p);
