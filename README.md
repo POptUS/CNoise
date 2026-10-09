@@ -9,11 +9,35 @@ These codes are based on the supplemental information for the papers:
     
 
 ### Estimating Computational Noise
-The following information (used in [1]) is provided to encourage the estimation of computational noise in applications and to determine strengths and limitations of the code. The following scripts produce basic noise level estimates from data. 
+The following information (used in [1]) is provided to encourage the estimation of computational noise in applications and to determine strengths and limitations of the code. The included scripts produce basic noise level estimates from data. 
+
+### Matlab/Octave
+The Matlab/Octave version lives under `m/`.
+
+### Python
+The Python version lives under `py/`, and the Python tests live at the
+repository root in `tests/`. Install it with `python -m pip install --upgrade
+pip setuptools wheel` followed by `python -m pip install --no-build-isolation
+-e py pytest`, then run the Python suite with `pytest tests`.
 
 ### Sample Problems
 
 
 ### Examples
-- `difftable` [Matlab/Octave](): Code for generating the example difference table in Table 3.1 of [1]. 
-- 
+- `difftable` [Matlab/Octave](m/difftable.m)  [Python](py/cnoise/difftable.py): Code for generating the example difference table in Table 3.1 of [1].
+
+## Contributing to CNoise
+
+Contributions are welcome in a variety of forms; please see [CONTRIBUTING](CONTRIBUTING.rst).
+
+## License 
+
+All code included in Cnoise is open source, with the particular form of license contained in the top-level 
+subdirectories.  If such a subdirectory does not contain a LICENSE file, then it is automatically licensed 
+as described in the otherwise encompassing Cnoise [LICENSE](/LICENSE).  
+
+## Resources
+
+To seek support or report issues, e-mail:
+
+ * ``poptus@mcs.anl.gov``

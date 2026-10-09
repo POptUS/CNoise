@@ -1,11 +1,13 @@
-# This is an example modified from 
-# https://florianschanda.github.io/miss_hit/configuration.html
 name: miss_hit
+
+# Example adapted from the MISS_HIT configuration docs:
+# https://florianschanda.github.io/miss_hit/configuration.html
 
 on:
   push:
     branches:
       - main
+      - develop
   pull_request:
     branches: '*'
 
@@ -19,13 +21,13 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
         fetch-depth: 1
 
     - name: Set up Python 3.12
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.12
 
@@ -45,3 +47,144 @@ jobs:
     - name: MISS_HIT Bug finder
       run: |
         mh_lint
+
+  python:
+    name: Python tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --no-build-isolation -e py pytest
+
+    - name: Run tests
+      run: |
+        pytest tests
+
+  parity:
+    name: Octave/Python parity
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        fetch-depth: 1
+
+    - name: Install Octave
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y octave
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: |
+        python -m pip install numpy
+
+    - name: Compare ECNoise and difftable
+      env:
+        PYTHONPATH: py
+      run: |
+        python - <<'PY'
+        import subprocess
+        from unittest.mock import patch
+
+        import numpy as np
+
+        from cnoise.ecnoise import ecnoise
+        from cnoise.difftable import difftable
+
+        def run_octave(command: str) -> list[str]:
+            result = subprocess.run(
+                ["octave-cli", "--quiet", "--eval", command],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+
+        fval = np.array([1.0, 1.01, 1.0, 1.01, 1.0, 1.01, 1.0])
+        py_fnoise, py_level, py_inform = ecnoise(len(fval), fval)
+
+        octave_cmd = (
+            "addpath('m'); "
+            "fval = [1.0, 1.01, 1.0, 1.01, 1.0, 1.01, 1.0]; "
+            "[fnoise, level, inform] = ECNoise(numel(fval), fval); "
+            "fprintf('%.17g\\n', fnoise); "
+            "fprintf('%.17g ', level); "
+            "fprintf('\\n%d\\n', inform);"
+        )
+        lines = run_octave(octave_cmd)
+        oct_fnoise = float(lines[0])
+        oct_level = np.fromstring(lines[1], sep=" ")
+        oct_inform = int(lines[2])
+
+        assert py_inform == oct_inform
+        np.testing.assert_allclose(py_level, oct_level, rtol=0.0, atol=1e-12)
+        np.testing.assert_allclose([py_fnoise], [oct_fnoise], rtol=0.0, atol=1e-12)
+
+        octave_cmd = (
+            "rand('state',197); "
+            "nf = 7; "
+            "h = 1e-2; "
+            "sigma = (1e-3) * 2 * sqrt(3); "
+            "U = rand(nf, 1); "
+            "x = (0:nf - 1) * h; "
+            "fval = zeros(nf, 1); "
+            "for i = 1:nf; "
+            "fval(i, 1) = cos(x(i)) + sin(x(i)) + sigma * U(i); "
+            "end; "
+            "level = zeros(nf - 1, 1); "
+            "gamma = 1.0; "
+            "T = fval; "
+            "for j = 1:nf - 1; "
+            "for i = 1:nf - j; "
+            "fval(i) = fval(i + 1) - fval(i); "
+            "T(i, j + 1) = fval(i); "
+            "end; "
+            "gamma = 0.5 * (j / (2 * j - 1)) * gamma; "
+            "level(j) = sqrt(gamma * mean(fval(1:nf - j).^2)); "
+            "end; "
+            "fprintf('U '); fprintf('%.17g ', U); fprintf('\\n'); "
+            "fprintf('T '); fprintf('%.17g ', T(:)); fprintf('\\n'); "
+            "fprintf('L '); fprintf('%.17g ', level); fprintf('\\n');"
+        )
+        lines = run_octave(octave_cmd)
+        oct_u = np.fromstring(lines[0][2:], sep=" ")
+        oct_table = np.fromstring(lines[1][2:], sep=" ").reshape(7, 7, order="F")
+        oct_level = np.fromstring(lines[2][2:], sep=" ")
+
+        class FakeRNG:
+            def random(self, n: int) -> np.ndarray:
+                assert n == len(oct_u)
+                return oct_u.copy()
+
+        with patch("cnoise.difftable.as_rng", lambda rng=None: FakeRNG()):
+            py_result = difftable(rng=197)
+
+        np.testing.assert_allclose(py_result.x, np.arange(7, dtype=float) * 1e-2, rtol=0.0, atol=1e-12)
+        np.testing.assert_allclose(py_result.fval, np.cos(py_result.x) + np.sin(py_result.x) + 1e-3 * 2.0 * np.sqrt(3.0) * oct_u, rtol=0.0, atol=1e-12)
+        np.testing.assert_allclose(py_result.table, oct_table, rtol=0.0, atol=1e-12)
+        np.testing.assert_allclose(py_result.level, oct_level, rtol=0.0, atol=1e-12)
+        assert py_result.latex.startswith(r"\begin{table}")
+        assert r"\sigma_k" in py_result.latex
+        PY
