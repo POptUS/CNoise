@@ -1,6 +1,6 @@
-name: miss_hit
+name: CNoise CI
 
-# Example adapted from the MISS_HIT configuration docs:
+# CNoise CI workflow adapted from the MISS_HIT configuration docs:
 # https://florianschanda.github.io/miss_hit/configuration.html
 
 on:
@@ -13,6 +13,7 @@ on:
 
 jobs:
   build:
+    name: MATLAB/Octave checks
 
     runs-on: ubuntu-latest
     defaults:
@@ -68,14 +69,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        python -m pip install --no-build-isolation -e py pytest
+        python -m pip install -e py pytest
 
     - name: Run tests
       run: |
         pytest tests
 
   parity:
-    name: Octave/Python parity
+    name: MATLAB/Octave vs Python parity
 
     runs-on: ubuntu-latest
 
@@ -96,13 +97,11 @@ jobs:
       with:
         python-version: 3.12
 
-    - name: Install dependencies
+    - name: Install package
       run: |
-        python -m pip install numpy
+        python -m pip install --no-build-isolation -e py
 
     - name: Compare ECNoise and difftable
-      env:
-        PYTHONPATH: py
       run: |
         python - <<'PY'
         import subprocess
