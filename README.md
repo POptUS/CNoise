@@ -24,7 +24,7 @@ pip setuptools wheel` followed by `python -m pip install --no-build-isolation
 
 
 ### Examples
-- `difftable` [Matlab/Octave](m/difftable.m)  [Python](py/cnoise/difftable.py): Code for generating the example difference table in Table 3.1 of [1].
+- `difftable` ([Matlab/Octave](m/difftable.m))  ([Python](py/cnoise/difftable.py)): Code for generating the example difference table in Table 3.1 of [1].
 
 ## Contributing to CNoise
 
