@@ -37,6 +37,11 @@ example. The repository follows that structure below.
   `cos(t) + sin(t) + noise` and produces the LaTeX table used in [1].
   [Matlab/Octave](m/difftable.m) | [Python](py/cnoise/difftable.py)
 
+#### Pictorial Example
+The figure below provides a representative visual example from the archive.
+
+![Pictorial example](docs/pngs/eigf_noise.png "Pictorial example")
+
 ### Matlab/Octave
 The Matlab/Octave code lives in `m/`.
 
