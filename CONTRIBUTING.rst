@@ -2,7 +2,7 @@ Contributing to CNoise
 ======================
 
 Contributions of source code, documentation, and fixes are happily
-accepted via GitHub pull request to
+accepted via a GitHub pull request to
 
     https://github.com/POptUS/CNoise/tree/develop
 
@@ -24,7 +24,7 @@ Issues may include reporting bugs or suggested features.
 By convention, user branch names should have a ``<type>/<name>`` format, where
 example types are ``feature``, ``bugfix``, ``testing``, ``docs``, and
 ``experimental``.
-Administrators may take a ``hotfix`` branch from the main, which will be
+Administrators may take a ``hotfix`` branch from the ``main`` branch, which will be
 merged into ``main`` (as a patch) and ``develop``.
 Administrators may also take a ``release`` branch off ``develop`` and then
 merge this branch into ``main`` and ``develop`` for a release.
