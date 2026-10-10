@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cnoise"
+version = "0.1.0"
+description = "Python version of the CNoise MATLAB examples"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "scipy",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+include = ["cnoise*"]
